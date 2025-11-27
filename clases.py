@@ -2,18 +2,28 @@
 class Personaje:
     #Aqui definiremos los atributos de posición los sprites el nivel en el que se encuentran y los límites a los que
     #pueden llegar
-    def __init__(self, x: int, y: int, sprites: tuple, nivel: int, tope_arriba: int, tope_abajo: int):
+    def __init__(self, x: int, y: int, sprites: dict, nivel: int, tope_arriba: int, tope_abajo: int):
         self.x = x
         self.y = y
         self.sprites = sprites
         self.nivel = nivel
         self.tope_arriba = tope_arriba
         self.tope_abajo = tope_abajo
+
     sprites_mario = {
-        'abajo':(2,0,0,16,16),
-        'arriba':(2,0,0,16,16),
-        'triste':(2,0,0,16,16)
+        'abajo_izq':(2,0,48,16,16),
+        'abajo_der':(2,0,32,16,16),
+        'arriba':(2,0,96,16,16),
+        'triste':(2,0,64,16,16)
     }
+
+    sprites_luigi = {
+        'abajo_izq':(2,16,48,16,16),
+        'abajo_der': (2, 16, 32, 16, 16),
+        'arriba': (2, 16, 96, 16, 16),
+        'triste': (2, 16, 64, 16, 16)
+    }
+
     @property
     def x(self) -> int:
         return self.__x
