@@ -9,7 +9,11 @@ class Personaje:
         self.nivel = nivel
         self.tope_arriba = tope_arriba
         self.tope_abajo = tope_abajo
-
+    sprites_mario = {
+        'abajo':(2,0,0,16,16),
+        'arriba':(2,0,0,16,16),
+        'triste':(2,0,0,16,16)
+    }
     @property
     def x(self) -> int:
         return self.__x
@@ -117,38 +121,6 @@ class Paquete:
             self.__y = y
 
 
-class Cinta:
-    def __init__(self, x: int, y: int, sprites: tuple, velocidad: float):
-        self.x = x
-        self.y = y
-        self.sprites = None
-        self.velocidad = velocidad
-
-    @property
-    def x(self) -> int:
-        return self.__x
-
-    @property
-    def y(self) -> int:
-        return self.__y
-
-    @x.setter
-    def x(self, x: int):
-        if not isinstance(x, int):
-            raise TypeError("La x debe ser un entero " + str(type(x)))
-        elif x < 0:
-            raise ValueError("La x no debe ser un número positivo")
-        else:
-            self.__x = x
-
-    @y.setter
-    def y(self, y: int):
-        if not isinstance(y, int):
-            raise TypeError("La y debe ser un entero " + str(type(y)))
-        elif y < 0:
-            raise ValueError("La y debe ser un número positivo")
-        else:
-            self.__y = y
 
 class Jefe:
     def __init__(self, x: int, y: int, sprites: tuple, enfadado: bool):
