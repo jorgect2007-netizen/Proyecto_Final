@@ -10,19 +10,6 @@ class Personaje:
         self.tope_arriba = tope_arriba
         self.tope_abajo = tope_abajo
 
-    sprites_mario = {
-        'abajo_izq':(2,0,48,16,16),
-        'abajo_der':(2,0,32,16,16),
-        'arriba':(2,0,96,16,16),
-        'triste':(2,0,64,16,16)
-    }
-
-    sprites_luigi = {
-        'abajo_izq':(2,16,48,16,16),
-        'abajo_der': (2, 16, 32, 16, 16),
-        'arriba': (2, 16, 96, 16, 16),
-        'triste': (2, 16, 64, 16, 16)
-    }
 
     @property
     def x(self) -> int:
@@ -54,10 +41,10 @@ class Personaje:
 #Este método define el movimiento que van a tener los personajes, el cual solo les permitirá cambiar de nivel
     def mover(self, direccion: str):
        if (direccion.lower() == "arriba" and self.nivel < self.tope_arriba):
-           self.y += None
+           self.y -= 20
            self.nivel += 2
        elif (direccion.lower() == "abajo" and self.nivel > self.tope_abajo):
-           self.y -= None
+           self.y += 20
            self.nivel -= 2
 
 
