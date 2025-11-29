@@ -2,14 +2,14 @@
 class Personaje:
     #Aqui definiremos los atributos de posición los sprites el nivel en el que se encuentran y los límites a los que
     #pueden llegar
-    def __init__(self, x: int, y: int, sprites: dict, nivel: int, tope_arriba: int, tope_abajo: int):
+    def __init__(self, x: int, y: int, sprites: dict, nivel: int, tope_arriba: int, tope_abajo: int, tablero):
         self.x = x
         self.y = y
         self.sprites = sprites
         self.nivel = nivel
         self.tope_arriba = tope_arriba
         self.tope_abajo = tope_abajo
-
+        self.tablero = tablero
 
     @property
     def x(self) -> int:
@@ -41,10 +41,10 @@ class Personaje:
 #Este método define el movimiento que van a tener los personajes, el cual solo les permitirá cambiar de nivel
     def mover(self, direccion: str):
        if (direccion.lower() == "arriba" and self.nivel < self.tope_arriba):
-           self.y -= 20
+           self.y -= 2*self.tablero.dif_niveles
            self.nivel += 2
        elif (direccion.lower() == "abajo" and self.nivel > self.tope_abajo):
-           self.y += 20
+           self.y += 2*self.tablero.dif_niveles
            self.nivel -= 2
 
 
