@@ -5,6 +5,7 @@ from clases import Jefe
 import pyxel
 
 class Tablero:
+
     sprites_mario = {
         'abajo_izq':(2,0,48,16,16),
         'abajo_der':(2,0,32,16,16),
@@ -18,7 +19,7 @@ class Tablero:
         'arriba': (2, 16, 96, 16, 16),
         'triste': (2, 16, 80, 16, 16)
     }
-    def __init__(self, ancho: int, alto: int):
+    def __init__(self, ancho: int, alto: int, altura_niv1: int, altura_niv2: int, altura_niv3: int, altura_niv4: int, altura_niv5: int):
 
         self.ancho = ancho
         self.alto = alto
@@ -48,5 +49,15 @@ class Tablero:
         pyxel.cls(7)
         pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites["abajo_izq"],0)
         pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0)
+        #Pilar que divide la pantalla
+        for i in range(16):
+            pyxel.blt(self.ancho//2, 0 + i * 16, 0, 0, 80, 16, 16)
+            pyxel.blt(self.ancho//2 + 16, 0 + i * 16, 0, 0, 80, 16, 16)
+            pyxel.blt(self.ancho//2 - 16, 0 + i * 16, 0, 0, 80, 16, 16)
 
-prueba = Tablero(256, 256)
+        #Dibujos de las cintas
+        for i in range(3):
+            #Cintas largas a la izquierda
+            pyxel.blt(124,0, 0, 0,0, 96, 16, 11)
+            #Cintas cortas a la izquierda
+prueba = Tablero(456, 256)
