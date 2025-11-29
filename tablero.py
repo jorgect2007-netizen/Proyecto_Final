@@ -19,13 +19,25 @@ class Tablero:
         'arriba': (2, 16, 96, 16, 16),
         'triste': (2, 16, 80, 16, 16)
     }
-    def __init__(self, ancho: int, alto: int, altura_niv1: int, altura_niv2: int, altura_niv3: int, altura_niv4: int, altura_niv5: int):
+    def __init__(self, ancho: int, alto: int):
 
         self.ancho = ancho
         self.alto = alto
-        self.mario = Personaje(x=100, y=100, sprites = self.sprites_mario, nivel=0,
+        #Definir altura de las cintas
+        self.num_niveles = 5
+        self.altura_cinta = 9
+        self.margen_arriba = 45
+        self.margen_abajo = 45
+        espacio_util = self.alto - self.margen_arriba - self.margen_abajo
+        self.dif_niveles = espacio_util // (self.num_niveles - 1)
+        self.niveles_y = [
+            self.margen_arriba + i * self.dif_niveles
+            for i in range(self.num_niveles)
+        ]
+        #Definir personajes
+        self.mario = Personaje(x=400, y=self.niveles_y[1], sprites = self.sprites_mario, nivel=0,
                                tope_arriba=4, tope_abajo=0)
-        self.luigi = Personaje(x=100, y=100, sprites = self.sprites_luigi,
+        self.luigi = Personaje(x=100, y=self.niveles_y[4]-20, sprites = self.sprites_luigi,
                                nivel=0,
                                tope_arriba=4, tope_abajo=0)
 
@@ -47,8 +59,8 @@ class Tablero:
 
     def draw(self):
         pyxel.cls(7)
-        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites["abajo_izq"],0)
-        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0)
+        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites["abajo_izq"],0, scale=2.5)
+        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0, scale=2.5)
         #Pilar que divide la pantalla
         for i in range(16):
             pyxel.blt(self.ancho//2, 0 + i * 16, 0, 0, 80, 16, 16)
@@ -56,8 +68,13 @@ class Tablero:
             pyxel.blt(self.ancho//2 - 16, 0 + i * 16, 0, 0, 80, 16, 16)
 
         #Dibujos de las cintas
-        for i in range(3):
             #Cintas largas a la izquierda
-            pyxel.blt(124,0, 0, 0,0, 96, 16, 11)
-            #Cintas cortas a la izquierda
+        for y in self.niveles_y:
+            if y % 2 == 0:
+                pyxel.blt(132, y, 0, 8, 16, 80, 16, 11)
+            else:
+                pyxel.blt(124, y, 0, 0, 0, 96, 16, 11)
+
+
+        pyxel.blt(124,0, 0,0, 96, 16, 11)
 prueba = Tablero(456, 256)
