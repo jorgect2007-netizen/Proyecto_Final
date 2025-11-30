@@ -85,11 +85,18 @@ class Camion:
 
 
 class Paquete:
-    def __init__(self, x: int, y: int, sprites: dict, nivel: int):
+    def __init__(self, x: int, y: int, sprites: dict, nivel: int, tablero, fase):
         self.x = x
         self.y = y
         self.sprites = sprites
         self.nivel = nivel
+        self.tablero = tablero
+        self.fase = fase
+
+        self.dirección = "izquierda"
+        self.sprite_actual = "fase1"
+        self.velocidad = 1
+
 
     @property
     def x(self) -> int:
@@ -116,6 +123,52 @@ class Paquete:
             raise ValueError("La y debe ser un número positivo")
         else:
             self.__y = y
+
+    def mover(self):
+        if self.dirección == "izquierda":
+            self.x -= self.velocidad
+        else:
+            self.x += self.velocidad
+        if self.x <= self.tablero.limite_izq:
+            self.cambio_nivel(lado_luigi=True)
+        if self.x >= self.tablero.limite_der:
+            self.cambio_nivel(lado_luigi=False)
+
+    def cambio_nivel(self, lado_luigi: bool):
+        if lado_luigi:
+            if self.tablero.luigi.nivel == self.nivel:
+                self.nivel += 1
+                self.y = self.tablero.dif_niveles
+                self.cambiar_sprite()
+            else:
+                self.caer()
+        else:
+            if self.tablero.mario.nivel == self.nivel:
+                self.nivel += 1
+                self.y = self.tablero.dif_niveles
+                self.cambiar_sprite()
+            else:
+                self.caer()
+
+    def cambiar_sprite(self):
+        if self.fase == 0 and self.x == self.tablero.centro:
+            self.sprite_actual = "fase2"
+            self.fase = 1
+        elif self.fase == 1 and self.x == self.tablero.centro:
+            self.sprite_actual = "fase3"
+            self.fase = 2
+        elif self.fase == 2 and self.x == self.tablero.centro:
+            self.sprite_actual = "fase4"
+            self.fase = 3
+        elif self.fase == 3 and self.x == self.tablero.centro:
+            self.sprite_actual = "fase5"
+            self.fase = 4
+        elif self.fase == 4 and self.x == self.tablero.centro:
+            self.sprite_actual = "fase6"
+            self.fase = 5
+
+    def caer(self):
+        self.y = self.tablero.y
 
 
 

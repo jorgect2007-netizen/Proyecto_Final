@@ -6,28 +6,25 @@ import pyxel
 
 class Tablero:
 
-    sprites_mario = {
-        'abajo_izq':(2,0,48,16,16),
+    sprites_mario = {'abajo_izq':(2,0,48,16,16),
         'abajo_der':(2,0,32,16,16),
         'arriba':(2,0,96,16,16),
-        'triste':(2,0,64,16,16)
-    }
+        'triste':(2,0,64,16,16)}
 
-    sprites_luigi = {
-        'abajo_izq':(2,16,48,16,16),
+    sprites_luigi = {'abajo_izq':(2,16,48,16,16),
         'abajo_der': (2, 16, 32, 16, 16),
         'arriba': (2, 16, 96, 16, 16),
-        'triste': (2, 16, 80, 16, 16)
-    }
-    sprites_paquete = {
-        'fase1':(1,0,0,16,16),
-        'fase2':(1,0,16,16,16),
-        'fase3':(1,0,32,16,16),
-        'fase4':(1,0,48,16,16),
-        'fase5':(1,0,64,16,16),
-        'fase6':(1,0,80,16,16),
-    }
+        'triste': (2, 16, 80, 16, 16)}
 
+    sprites_paquete = {
+        'fase1': (1, 0, 0, 16, 16),
+        'fase2': (1, 0, 16, 16, 16),
+        'fase3': (1, 0, 32, 16, 16),
+        'fase4': (1, 0, 48, 16, 16),
+        'fase5': (1, 0, 64, 16, 16),
+        'fase6': (1, 0, 80, 16, 16),
+
+    }
     def __init__(self, ancho: int, alto: int):
 
         self.ancho = ancho
@@ -44,6 +41,14 @@ class Tablero:
             self.margen_arriba + i * self.dif_niveles
             for i in range(self.num_niveles)
         ]
+        #Mov. Cajas
+        self.limite_izq =(148)
+        self.limite_der =(284)
+        self.centro =(256)
+        self.paquetes = []  # lista de paquetes activos
+        self.puntos = 0  # puntuación actual
+        self.min_paquetes = 1  # mínimo de paquetes simultáneos
+
         #Zona de mario
         self.zona_mario=self.ancho
         #Definir personajes
@@ -56,6 +61,19 @@ class Tablero:
         pyxel.load("assets/resources.pyxres")
         pyxel.run(self.update, self.draw)
 
+    def actualizar_min_paquetes(self):
+        self.min_paquetes = 1 + (self.puntos // 50)
+
+    def crear_paquete(self):
+        paquete = Paquete(
+            x=self.limite_der,  # aparece en la derecha
+            y=self.niveles_y[4]-4,  # cinta de abajo
+            sprites=self.sprites_paquete,
+            nivel=0,  # nivel más bajo
+            tablero=self,
+            fase=0
+        )
+        self.paquetes.append(paquete)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_UP):
@@ -68,6 +86,16 @@ class Tablero:
         if pyxel.btnp(pyxel.KEY_S):
             self.luigi.mover("abajo")
 
+    # --- ACTUALIZAR Nº MÍNIMO DE PAQUETES ---
+        self.actualizar_min_paquetes()
+
+    # --- CREAR PAQUETES SI HAY MENOS DEL MÍNIMO ---
+        while len(self.paquetes) < self.min_paquetes:
+            self.crear_paquete()
+
+    # --- ACTUALIZAR MOVIMIENTO DE LOS PAQUETES ---
+        for paquete in self.paquetes:
+         paquete.mover()
 
     def draw(self):
         pyxel.cls(13)
@@ -79,6 +107,12 @@ class Tablero:
         #Mario y Luigi
         pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites["abajo_der"],0, scale=3)
         pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0, scale=3)
+
+        # Dibujar paquetes
+        for paquete in self.paquetes:
+            spr = paquete.sprites[paquete.sprite_actual]
+            pyxel.blt(paquete.x,paquete.y,spr[0], spr[1], spr[2], spr[3], spr[4],0,scale=3)
+
         #Pilar que divide la pantalla
         for i in range(16):
             pyxel.blt(self.ancho//2, 0 + i * 16, 0, 0, 80, 16, 16)
@@ -87,39 +121,42 @@ class Tablero:
 
         #Cintas a la izquierda
         for y in self.niveles_y:
-            #Cintas cortas
+            # Cintas cortas
             if y % 2 == 0:
                 pyxel.blt(160, y, 0, 8, 16, 80, 16, 11)
-            #Cintas largas
+            # Cintas largas
             else:
                 pyxel.blt(152, y, 0, 0, 0, 96, 16, 11)
 
-        #Cintas a la derecha
+            # Cintas a la derecha
         for y in self.niveles_y:
+            # Cintas cortas
             if y % 2 == 0:
                 pyxel.blt(280, y, 0, 0, 0, -96, 16, 11)
+            # Cintas largas
             else:
                 pyxel.blt(288, y, 0, 8, 16, -80, 16, 11)
 
-        #Cinta de la que salen las cajas
-        pyxel.blt(424,self.niveles_y[4]+17,0,0, 0, 96, 16, 11)
+            # Cinta de la que salen las cajas
+        pyxel.blt(424, self.niveles_y[4] + 17, 0, 0, 0, 96, 16, 11)
 
-        #Plataformas luigi
-        pyxel.blt(self.luigi.x - 90,self.niveles_y[4]+9,0,0,104, 90,9,0,scale = 2)
+        # Plataformas luigi
+        pyxel.blt(self.luigi.x - 90, self.niveles_y[4] + 9, 0, 0, 104, 90, 9, 0, scale=2)
         pyxel.blt(self.luigi.x - 30, self.niveles_y[2] + 9, 0, 0, 104, 35, 9, 0, scale=2)
         pyxel.blt(self.luigi.x - 30, self.niveles_y[0] + 9, 0, 0, 104, 35, 9, 0, scale=2)
-        #Plataformas mario
-        pyxel.blt(self.mario.x + 5,  self.niveles_y[4]+49, 0, 0, 104, 35, 9, 0, scale=2)
-        pyxel.blt(self.mario.x + 23,  self.niveles_y[3]+9, 0, 0, 104, 72, 9, 0, scale=2)
-        pyxel.blt(self.mario.x + 5,  self.niveles_y[1]+9, 0, 0, 104, 35, 9, 0, scale=2)
+        # Plataformas mario
+        pyxel.blt(self.mario.x + 5, self.niveles_y[4] + 49, 0, 0, 104, 35, 9, 0, scale=2)
+        pyxel.blt(self.mario.x + 23, self.niveles_y[3] + 9, 0, 0, 104, 72, 9, 0, scale=2)
+        pyxel.blt(self.mario.x + 5, self.niveles_y[1] + 9, 0, 0, 104, 35, 9, 0, scale=2)
 
-        #Zona del camión
-        pyxel.blt(71,57,0,112,0,4,17,0,scale=2)
+        # Zona del camión
+        pyxel.blt(71, 57, 0, 112, 0, 4, 17, 0, scale=2)
         pyxel.blt(0, 79, 0, 0, 104, 50, 9, 0, scale=2)
-        pyxel.blt(18,40,1, 16,0,32,24,14,scale=2)
-        #Marcador de fallos y puntos
-        pyxel.text(300,10,"FALLOS: 2", 0)
-        pyxel.text(500,10,'i', 0)
+        pyxel.blt(18, 40, 1, 16, 0, 32, 24, 14, scale=2)
+        # Marcador de fallos y puntos
+        pyxel.text(300, 10, "FALLOS: 2", 0)
+        pyxel.text(500, 10, 'i', 0)
 
 
 prueba = Tablero(512, 256)
+
