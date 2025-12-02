@@ -7,12 +7,14 @@ import pyxel
 
 class Tablero:
 
-    sprites_mario = {'abajo_izq':(2,0,48,16,16),
+    sprites_mario = {
+        'abajo_izq':(2,0,48,16,16),
         'abajo_der':(2,0,32,16,16),
         'arriba':(2,0,96,16,16),
         'triste':(2,0,64,16,16)}
 
-    sprites_luigi = {'abajo_izq':(2,16,48,16,16),
+    sprites_luigi = {
+        'abajo_izq':(2,16,48,16,16),
         'abajo_der': (2, 16, 32, 16, 16),
         'arriba': (2, 16, 96, 16, 16),
         'triste': (2, 16, 80, 16, 16)}
@@ -24,7 +26,6 @@ class Tablero:
         'fase4': (1, 0, 48, 16, 16),
         'fase5': (1, 0, 64, 16, 16),
         'fase6': (1, 0, 80, 16, 16),
-
     }
     def __init__(self, ancho: int, alto: int):
 
@@ -50,21 +51,28 @@ class Tablero:
                                tope_arriba=4, tope_abajo=0, tablero=self)
         self.luigi = Personaje(x= 124, y=self.niveles_y[4]-28, sprites = self.sprites_luigi,
                                nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
-
-        self.cintas = [
-            Cinta(self.niveles_y[4] + 17, -1, 512, 490),
-            Cinta(self.niveles_y[4] + 17, -1, 380, 20),  # nivel 0 → va hacia la izquierda
-            Cinta(150, +1, 20, 250),  # nivel 1 → va hacia la derecha
-            Cinta(120, -1, 250, 20),  # nivel 2 → va hacia la izquierda
-            Cinta(90, +1, 20, 250),  # nivel 3 → va hacia la derecha
-            Cinta(60, -1, 250, 10),  # nivel 4 → va hacia la izquierda hacia el camión
-        ]
+        for y in self.niveles_y:
+            self.cintas = [
+                Cinta(self.niveles_y[4] + 17, -1, 512, 490),
+                Cinta(y, -1, 380, 148),  # nivel 0 → va hacia la izquierda
+                Cinta(y, +1, 148, 380),  # nivel 1 → va hacia la derecha
+                Cinta(y, -1, 380, 148),  # nivel 2 → va hacia la izquierda
+                Cinta(y, +1, 148, 380),  # nivel 3 → va hacia la derecha
+                Cinta(y, -1, 380, 148),  # nivel 4 → va hacia la izquierda hacia el camión
+            ]
+        self.paquetes = []
+        self.puntos = 0  # puntuación actual
+        self.min_paquetes = 1  # mínimo de paquetes simultáneos
 
         pyxel.init(self.ancho, self.alto, title="Demo Juego Mario Bros")
         pyxel.load("assets/resources.pyxres")
         pyxel.run(self.update, self.draw)
 
+    def actualizar_min_paquetes(self):
+        self.min_paquetes = 1 + (self.puntos // 50)
 
+    def generar_paquete(self):
+        self.paquetes.append(Paquete(cinta_id=0,x=self.cintas[0].x_inicio,y=self.niveles_y[4] + 13, sprites =self.sprites_paquete, nivel=0, ))
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_UP):
@@ -77,6 +85,13 @@ class Tablero:
         if pyxel.btnp(pyxel.KEY_S):
             self.luigi.mover("abajo")
 
+        self.actualizar_min_paquetes()
+
+        while len(self.paquetes) < self.min_paquetes:
+            self.generar_paquete()
+
+        for paquete in self.paquetes:
+            paquete.mover(self.cintas, centro=self.ancho//2)
 
 
     def draw(self):
@@ -91,7 +106,9 @@ class Tablero:
         pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0, scale=3)
 
         # Dibujar paquetes
-
+        for paquete in self.paquetes:
+            sprite = paquete.sprites[f"fase{paquete.fase}"]
+            pyxel.blt(paquete.x, paquete.y, *sprite, scale=3, colkey=0)
 
         #Pilar que divide la pantalla
         for i in range(16):
