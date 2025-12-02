@@ -131,12 +131,14 @@ class Paquete:
     def mover(self):
         if self.direccion == "izquierda":
             self.x -= self.velocidad
+            self.cambio_nivel()
         else:
             self.x += self.velocidad
+            self.cambio_nivel()
 
 
     def cambio_nivel(self):
-        if self.x <= self.tablero.limite_in:
+        if self.x == self.tablero.limite_in:
             if self.tablero.mario.nivel == self.nivel:
                 self.y -= self.tablero.niveles_y[self.nivel] - 10
                 self.x = self.tablero.limite_der
@@ -144,7 +146,7 @@ class Paquete:
             else:
                 self.caer()
 
-        if self.x <= self.tablero.limite_izq:
+        elif self.x <= self.tablero.limite_izq:
             if self.tablero.luigi.nivel == self.nivel:
                 self.nivel += 1
                 self.y -= self.tablero.niveles_y[self.nivel] - 45
@@ -154,7 +156,7 @@ class Paquete:
                 self.caer()
 
 
-        if self.x >= self.tablero.limite_der:
+        elif self.x >= self.tablero.limite_der:
             if self.tablero.mario.nivel == self.nivel:
                 self.y -= self.tablero.niveles_y[self.nivel]-45
                 self.nivel += 1

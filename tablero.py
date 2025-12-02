@@ -44,8 +44,8 @@ class Tablero:
         #Mov. Cajas
         self.limite_izq = (148)
         self.limite_der = (380)
-        self.limite_in = (490)
-        self.inicio = (505)
+        self.limite_in = (500)
+        self.inicio = (512)
         self.centro = (256)
         self.paquetes = []  # lista de paquetes activos
         self.puntos = 0  # puntuación actual
@@ -73,7 +73,7 @@ class Tablero:
             sprites=self.sprites_paquete,
             nivel=0,  # nivel más bajo
             tablero=self,
-            fase=-1
+            fase=0
         )
         self.paquetes.append(paquete)
 
@@ -98,6 +98,7 @@ class Tablero:
     # --- ACTUALIZAR MOVIMIENTO DE LOS PAQUETES ---
         for paquete in self.paquetes:
             paquete.mover()
+
 
     def draw(self):
         pyxel.cls(13)
