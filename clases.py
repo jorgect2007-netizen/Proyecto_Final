@@ -93,7 +93,7 @@ class Paquete:
         self.tablero = tablero
         self.fase = fase
 
-        self.dirección = "izquierda"
+        self.direccion = "izquierda"
         self.sprite_actual = "fase1"
         self.velocidad = 1
 
@@ -124,29 +124,42 @@ class Paquete:
         else:
             self.__y = y
 
+    def movimiento_inicial(self, lado_mario: bool):
+        self.x -= self.velocidad
+
+
     def mover(self):
-        if self.dirección == "izquierda":
+        if self.direccion == "izquierda":
             self.x -= self.velocidad
         else:
             self.x += self.velocidad
-        if self.x <= self.tablero.limite_izq:
-            self.cambio_nivel(lado_luigi=True)
-        if self.x >= self.tablero.limite_der:
-            self.cambio_nivel(lado_luigi=False)
 
-    def cambio_nivel(self, lado_luigi: bool):
-        if lado_luigi:
-            if self.tablero.luigi.nivel == self.nivel:
+
+    def cambio_nivel(self):
+        if self.x <= self.tablero.limite_in:
+            if self.tablero.mario.nivel == self.nivel:
+                self.y -= self.tablero.niveles_y[self.nivel] - 10
+                self.x = self.tablero.limite_der
                 self.nivel += 1
-                self.y = self.tablero.dif_niveles
-                self.cambiar_sprite()
             else:
                 self.caer()
-        else:
-            if self.tablero.mario.nivel == self.nivel:
+
+        if self.x <= self.tablero.limite_izq:
+            if self.tablero.luigi.nivel == self.nivel:
                 self.nivel += 1
-                self.y = self.tablero.dif_niveles
+                self.y -= self.tablero.niveles_y[self.nivel] - 45
                 self.cambiar_sprite()
+                self.direccion = "derecha"
+            else:
+                self.caer()
+
+
+        if self.x >= self.tablero.limite_der:
+            if self.tablero.mario.nivel == self.nivel:
+                self.y -= self.tablero.niveles_y[self.nivel]-45
+                self.nivel += 1
+                self.cambiar_sprite()
+                self.direccion = "derecha"
             else:
                 self.caer()
 
@@ -168,7 +181,7 @@ class Paquete:
             self.fase = 5
 
     def caer(self):
-        self.y = self.tablero.y
+        self.y = self.tablero.alto
 
 
 

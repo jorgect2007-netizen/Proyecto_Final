@@ -42,9 +42,11 @@ class Tablero:
             for i in range(self.num_niveles)
         ]
         #Mov. Cajas
-        self.limite_izq =(148)
-        self.limite_der =(284)
-        self.centro =(256)
+        self.limite_izq = (148)
+        self.limite_der = (380)
+        self.limite_in = (490)
+        self.inicio = (505)
+        self.centro = (256)
         self.paquetes = []  # lista de paquetes activos
         self.puntos = 0  # puntuación actual
         self.min_paquetes = 1  # mínimo de paquetes simultáneos
@@ -55,7 +57,7 @@ class Tablero:
         self.mario = Personaje(x=390, y=self.niveles_y[4]+13, sprites = self.sprites_mario, nivel=0,
                                tope_arriba=4, tope_abajo=0, tablero=self)
         self.luigi = Personaje(x= 124, y=self.niveles_y[4]-28, sprites = self.sprites_luigi,
-                               nivel=0, tope_arriba=4, tope_abajo=0, tablero=self)
+                               nivel=1, tope_arriba=4, tope_abajo=1, tablero=self)
 
         pyxel.init(self.ancho, self.alto, title="Demo Juego Mario Bros")
         pyxel.load("assets/resources.pyxres")
@@ -66,12 +68,12 @@ class Tablero:
 
     def crear_paquete(self):
         paquete = Paquete(
-            x=self.limite_der,  # aparece en la derecha
-            y=self.niveles_y[4]-4,  # cinta de abajo
+            x=self.inicio,  # aparece en la derecha
+            y=self.niveles_y[4] + 13,  # cinta de abajo
             sprites=self.sprites_paquete,
             nivel=0,  # nivel más bajo
             tablero=self,
-            fase=0
+            fase=-1
         )
         self.paquetes.append(paquete)
 
@@ -95,7 +97,7 @@ class Tablero:
 
     # --- ACTUALIZAR MOVIMIENTO DE LOS PAQUETES ---
         for paquete in self.paquetes:
-         paquete.mover()
+            paquete.mover()
 
     def draw(self):
         pyxel.cls(13)
@@ -137,7 +139,7 @@ class Tablero:
             else:
                 pyxel.blt(288, y, 0, 8, 16, -80, 16, 11)
 
-            # Cinta de la que salen las cajas
+        # Cinta de la que salen las cajas
         pyxel.blt(424, self.niveles_y[4] + 17, 0, 0, 0, 96, 16, 11)
 
         # Plataformas luigi
