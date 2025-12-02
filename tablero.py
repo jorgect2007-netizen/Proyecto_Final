@@ -2,6 +2,7 @@ from clases import Personaje
 from clases import Camion
 from clases import Paquete
 from clases import Jefe
+from clases import Cinta
 import pyxel
 
 class Tablero:
@@ -49,6 +50,15 @@ class Tablero:
                                tope_arriba=4, tope_abajo=0, tablero=self)
         self.luigi = Personaje(x= 124, y=self.niveles_y[4]-28, sprites = self.sprites_luigi,
                                nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
+
+        self.cintas = [
+            Cinta(self.niveles_y[4] + 17, -1, 512, 490),
+            Cinta(self.niveles_y[4] + 17, -1, 380, 20),  # nivel 0 → va hacia la izquierda
+            Cinta(150, +1, 20, 250),  # nivel 1 → va hacia la derecha
+            Cinta(120, -1, 250, 20),  # nivel 2 → va hacia la izquierda
+            Cinta(90, +1, 20, 250),  # nivel 3 → va hacia la derecha
+            Cinta(60, -1, 250, 10),  # nivel 4 → va hacia la izquierda hacia el camión
+        ]
 
         pyxel.init(self.ancho, self.alto, title="Demo Juego Mario Bros")
         pyxel.load("assets/resources.pyxres")

@@ -120,6 +120,14 @@ class Paquete:
         else:
             self.__y = y
 
+class Cinta:
+    def __init__(self, y, direccion, x_inicio, x_fin):
+        self.y = y
+        self.direccion = direccion
+        self.x_inicio = x_inicio
+        self.x_fin = x_fin
+
+
 
 
 class Jefe:
