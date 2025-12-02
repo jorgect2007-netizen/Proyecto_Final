@@ -48,7 +48,7 @@ class Tablero:
         self.mario = Personaje(x=390, y=self.niveles_y[4]+13, sprites = self.sprites_mario, nivel=0,
                                tope_arriba=4, tope_abajo=0, tablero=self)
         self.luigi = Personaje(x= 124, y=self.niveles_y[4]-28, sprites = self.sprites_luigi,
-                               nivel=1, tope_arriba=4, tope_abajo=1, tablero=self)
+                               nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
 
         pyxel.init(self.ancho, self.alto, title="Demo Juego Mario Bros")
         pyxel.load("assets/resources.pyxres")
@@ -81,9 +81,7 @@ class Tablero:
         pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites["abajo_der"],0, scale=3)
 
         # Dibujar paquetes
-        for paquete in self.paquetes:
-            spr = paquete.sprites[paquete.sprite_actual]
-            pyxel.blt(paquete.x,paquete.y,spr[0], spr[1], spr[2], spr[3], spr[4],0,scale=3)
+
 
         #Pilar que divide la pantalla
         for i in range(16):
