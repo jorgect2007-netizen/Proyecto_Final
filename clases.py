@@ -97,6 +97,9 @@ class Paquete:
         self.sprite_actual = "fase1"
         self.velocidad = 1
 
+class Cinta:
+
+
 
     @property
     def x(self) -> int:

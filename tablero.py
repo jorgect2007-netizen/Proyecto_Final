@@ -41,15 +41,6 @@ class Tablero:
             self.margen_arriba + i * self.dif_niveles
             for i in range(self.num_niveles)
         ]
-        #Mov. Cajas
-        self.limite_izq = (148)
-        self.limite_der = (380)
-        self.limite_in = (500)
-        self.inicio = (512)
-        self.centro = (256)
-        self.paquetes = []  # lista de paquetes activos
-        self.puntos = 0  # puntuación actual
-        self.min_paquetes = 1  # mínimo de paquetes simultáneos
 
         #Zona de mario
         self.zona_mario=self.ancho
@@ -63,19 +54,7 @@ class Tablero:
         pyxel.load("assets/resources.pyxres")
         pyxel.run(self.update, self.draw)
 
-    def actualizar_min_paquetes(self):
-        self.min_paquetes = 1 + (self.puntos // 50)
 
-    def crear_paquete(self):
-        paquete = Paquete(
-            x=self.inicio,  # aparece en la derecha
-            y=self.niveles_y[4] + 13,  # cinta de abajo
-            sprites=self.sprites_paquete,
-            nivel=0,  # nivel más bajo
-            tablero=self,
-            fase=0
-        )
-        self.paquetes.append(paquete)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_UP):
@@ -88,16 +67,6 @@ class Tablero:
         if pyxel.btnp(pyxel.KEY_S):
             self.luigi.mover("abajo")
 
-    # --- ACTUALIZAR Nº MÍNIMO DE PAQUETES ---
-        self.actualizar_min_paquetes()
-
-    # --- CREAR PAQUETES SI HAY MENOS DEL MÍNIMO ---
-        while len(self.paquetes) < self.min_paquetes:
-            self.crear_paquete()
-
-    # --- ACTUALIZAR MOVIMIENTO DE LOS PAQUETES ---
-        for paquete in self.paquetes:
-            paquete.mover()
 
 
     def draw(self):
