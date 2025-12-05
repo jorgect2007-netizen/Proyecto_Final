@@ -1,5 +1,9 @@
-# tablero.py
-from clases import Personaje, Camion, Paquete, Jefe, Cinta
+#Importamos las clases
+from clases import Personaje
+from clases import Camion
+from clases import Paquete
+from clases import Jefe
+from clases import Cinta
 import pyxel
 
 
