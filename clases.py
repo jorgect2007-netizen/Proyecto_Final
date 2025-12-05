@@ -70,55 +70,64 @@ class Personaje:
         #A luigi esto no le hace falta porque siempre coge las cajas de la derecha
             self.sprite_actual = "abajo_der"
 
-
+#Aquí definimos la clase camión
 class Camion:
     def __init__(self, x: int, y: int, sprites: dict):
-        self.x_inicial = x
+        self.x_inicial = x #En que x aparece el camion
+        # Dónde aparece el personaje
         self.x = x
         self.y = y
-        self.sprites = sprites
+        self.sprites = sprites  # Sus posibles sprites
+        #Cantidad de cajas con las que el camión empieza y la máxima
         self.cajas = 0
         self.max_cajas = 8
 
-        # Estado de animación
+        #Estado de la animación (que pase de estar en reposo a estar en reparto)
         self.animacion_salida = False
         self.velocidad_salida = -1
         self.temporizador = 0
         self.tiempo_espera = 3 * 30
 
+    #Este método se usa para que se le vayan sumando cajas al camión conforme se las vayan entregando y que
+    #cuando el camión este lleno empiece la animación de que está en reparto
     def llenar(self):
         if self.cajas < self.max_cajas:
             self.cajas += 1
             if self.cajas == self.max_cajas:
                 self.iniciar_salida()
-
+    #Cuando el camión está lleno se activa este método en el que el mapa se queda congelado durante el tiempo de espera
+    #antes definido
     def iniciar_salida(self):
         self.animacion_salida = True
         self.temporizador = self.tiempo_espera
 
+    #Aquí definimos el movimiento del camión cuando esté en reparto
     def update(self):
         if self.animacion_salida:
             self.x += self.velocidad_salida
-            self.temporizador -= 1
+            self.temporizador -= 1 #Para que cuando llegue a 0 el camión vuelva a la posición inicial
             if self.temporizador <= 0:
                 self.reset()
 
+    #Este método hace que cuando el camión termine de repartir vuelva a su posición inicial
     def reset(self):
         self.cajas = 0
         self.x = self.x_inicial
         self.animacion_salida = False
 
-
+#Aquí definiremos las cintas del juego
 class Cinta:
     def __init__(self, y, direccion, x_inicio, x_fin):
-        self.y = y
-        self.direccion = direccion
+        self.y = y #La altura de las cintas
+        self.direccion = direccion #Hacia donde se mueven
+        #Donde empieza la cinta y donde acaba
         self.x_inicio = x_inicio
         self.x_fin = x_fin
 
+#Aquí definiremos los paquetes/cajas del juego
 class Paquete:
     def __init__(self, cinta_id: int, x: int, y: int, sprites: dict, nivel: int):
-        self.cinta_id = cinta_id
+        self.cinta_id = cinta_id #En que cinta se encuentra el paquete
         self.x = x
         self.y = y
         self.sprites = sprites
