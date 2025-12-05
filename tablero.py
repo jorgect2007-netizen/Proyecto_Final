@@ -6,7 +6,7 @@ from clases import Jefe
 from clases import Cinta
 import pyxel
 
-
+#Creamos la clase tablero
 class Tablero:
     sprites_mario = {
         'abajo_izq': (2, 0, 48, 16, 16),
@@ -205,15 +205,7 @@ class Tablero:
         self.puntos += 10
         pyxel.play(0, 2)
 
-        # ANIMACIÓN: Luigi entrega al camión (o Mario si fuera el caso, pero es Luigi aquí)
-        # La cinta 5 es la del camión, viene de Luigi (Nivel 4 lógico, plataforma alta)
-        if self.mario.nivel == 4:  # Si fuera Mario
-            self.mario.animar("entregar")
-        else:
-            # Realmente es Luigi quien está arriba a la izquierda entregando al camión?
-            # Según tu lógica anterior cinta 5 "viene de Mario hacia camion".
-            # Si Mario entrega al camión:
-            self.luigi.animar("entregar")
+        self.luigi.animar("entregar")
 
         # Lógica del camión
         self.camion.llenar()
@@ -277,8 +269,8 @@ class Tablero:
         pyxel.blt(self.x_base_luigi, self.niveles_y[1] - 25, 0, 0, 56, 16, 16, 0, scale=2)
 
         # Personajes
-        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites[self.mario.direccion_sprite], 0, scale=3)
-        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites[self.luigi.direccion_sprite], 0, scale=3)
+        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites[self.mario.sprite_actual], 0, scale=3)
+        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites[self.luigi.sprite_actual], 0, scale=3)
 
         # Paquetes
         for paquete in self.paquetes:

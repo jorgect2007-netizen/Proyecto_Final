@@ -1,102 +1,74 @@
-# clases.py
-import pyxel
-
-
+#Con esta clase definiremos a Mario y a Luigi
 class Personaje:
     def __init__(self, nombre: str, x: int, y: int, sprites: dict, nivel: int, tope_arriba: int, tope_abajo: int,
                  tablero):
-        self.nombre = nombre  # "mario" o "luigi"
+        self.nombre = nombre
+        #Dónde aparece el personaje
         self.x = x
         self.y = y
-        self.sprites = sprites
-        self.nivel = nivel
+        self.sprites = sprites #Sus posibles sprites
+        self.nivel = nivel #Nivel en el que aparece
+        #Nivel máximo y mínimo al que puede acceder
         self.tope_arriba = tope_arriba
         self.tope_abajo = tope_abajo
+        #Implementamos el tablero para que el personaje tenga conocimiento del elemento del escenario
         self.tablero = tablero
+        #Sprite con el que vemos al personaje
+        self.sprite_actual = "abajo_der"
 
-        # Estado visual
-        self.direccion_sprite = "abajo_der"
+        #Valor inicial para el tiempo que va a estar durante otro sprite el personaje para las animaciones
+        self.tiempo_animacion = 0
 
-        # Sistema de animación temporal (acción de levantar/entregar)
-        self.timer_animacion = 0
-        self.sprite_accion = "arriba"
-
-    @property
-    def x(self) -> int:
-        return self.__x
-
-    @property
-    def y(self) -> int:
-        return self.__y
-
-    @x.setter
-    def x(self, x: int):
-        if not isinstance(x, int):
-            raise TypeError("La x debe ser un entero")
-        self.__x = x
-
-    @y.setter
-    def y(self, y: int):
-        if not isinstance(y, int):
-            raise TypeError("La y debe ser un entero")
-        self.__y = y
-
+    #Definimos el movimiento de los personajes para que no puedan moverse más alla del tope que tienen por arriba y
+    #por abajo
     def mover(self, direccion: str):
-        if (direccion.lower() == "arriba" and self.nivel < self.tope_arriba):
+        if direccion.lower() == "arriba" and self.nivel < self.tope_arriba:
+            #Si el jugador mueve arriba el personaje se mueve 2 niveles que es lo que le corresponde
             self.y -= 2 * self.tablero.dif_niveles
             self.nivel += 2
-            # NOTA: Ya no cambiamos el sprite aquí directamente,
-            # se encarga actualizar_sprite()
 
-        elif (direccion.lower() == "abajo" and self.nivel > self.tope_abajo):
+
+        elif direccion.lower() == "abajo" and self.nivel > self.tope_abajo:
+            #Si el jugador mueve abajo el personaje se mueve 2 niveles que es lo que le corresponde
             self.y += 2 * self.tablero.dif_niveles
             self.nivel -= 2
 
     def animar(self, tipo: str):
-        """
-        Activa una animación breve.
-        tipo: 'subir' (coger caja) o 'entregar' (camión)
-        """
-        self.timer_animacion = 5  # Duración en frames (aprox 0.15s, "microsegundo")
-
+        #Esta función cambia el sprite durante el tiempo que indiquemos cuando el personaje tenga que cambiar los
+        #paquetes de cinta o cuando Luigi entregue las cajas en el paquete
+        self.tiempo_animacion = 5  #Serían 5 frames que son 0.15 segundos más o menos
+        #Si sube la caja se pone el sprite llamado "arriba"
         if tipo == "subir":
-            self.sprite_accion = "arriba"
+            self.sprite_actual = "arriba"
+        #Si Luigi entrega el paquete se pone el sprite llamado "abajo_izq"
         elif tipo == "entregar":
-            if self.nombre == "luigi":
-                self.sprite_accion = "abajo_izq"  # Luigi entregando al camión
-            else:
-                self.sprite_accion = "arriba"  # Mario entregando (si hubiera caso)
+            self.sprite_actual = "abajo_izq"
 
     def actualizar_sprite(self):
-        """
-        Determina qué sprite mostrar en cada frame según prioridad:
-        1. Jefe regañando (Triste)
-        2. Animación activa (Acción)
-        3. Estado de reposo (Según nivel y personaje)
-        """
-        # 1. PRIORIDAD: JEFE REGAÑANDO
+    #Se actualiza el sprite del personaje dependiendo de la situación
         if self.tablero.pausado_por_jefe:
-            self.direccion_sprite = "triste"
+        #Si se ha caido una caja y aparece el jefe el personaje tiene que tener el sprite "triste"
+            self.sprite_actual = "triste"
             return
 
-        # 2. PRIORIDAD: ANIMACIÓN DE ACCIÓN (Microsegundo al coger/soltar)
-        if self.timer_animacion > 0:
-            self.direccion_sprite = self.sprite_accion
-            self.timer_animacion -= 1
+        #Usamos esta función para que cuando se haga una animación se pueda ver bien como se cambia de sprite
+        if self.tiempo_animacion > 0:
+            self.tiempo_animacion -= 1
             return
 
-        # 3. PRIORIDAD: ESTADO NATURAL (REPOSO)
+        #Usamos esto para que cuando Mario y Luigi estén en reposo en sus respectivas plataformas usen los sprites
+        #correspondientes
         if self.nombre == "mario":
-            # Mario: Nivel 0 (Abajo) -> Mira derecha
-            #        Niveles superiores -> Mira izquierda
+        #Si Mario está en la plataforma 0 tiene el sprite "abajo_der" para coger las cajas de la derecha y si no el
+        #sprite "abajo_izq" para que coja las cajas de las cintas de su izquierda
             if self.nivel == 0:
-                self.direccion_sprite = "abajo_der"
+                self.sprite_actual = "abajo_der"
             else:
-                self.direccion_sprite = "abajo_izq"
+                self.sprite_actual = "abajo_izq"
 
         elif self.nombre == "luigi":
-            # Luigi: Siempre mira a la derecha en reposo en todas las plataformas
-            self.direccion_sprite = "abajo_der"
+        #A luigi esto no le hace falta porque siempre coge las cajas de la derecha
+            self.sprite_actual = "abajo_der"
 
 
 class Camion:
@@ -143,8 +115,6 @@ class Cinta:
         self.direccion = direccion
         self.x_inicio = x_inicio
         self.x_fin = x_fin
-        self.limite_in = 500
-
 
 class Paquete:
     def __init__(self, cinta_id: int, x: int, y: int, sprites: dict, nivel: int):
