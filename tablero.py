@@ -8,20 +8,22 @@ import pyxel
 
 #Creamos la clase tablero
 class Tablero:
+    #Aquí ponemos los posibles sprites de todos los personajes
+    #Aquí los posibles sprites de mario
     sprites_mario = {
         'abajo_izq': (2, 0, 48, 16, 16),
         'abajo_der': (2, 0, 32, 16, 16),
         'arriba': (2, 0, 96, 16, 16),
         'triste': (2, 0, 64, 16, 16)
     }
-
+    #Aquí los posibles sprites de luigi
     sprites_luigi = {
         'abajo_izq': (2, 16, 48, 16, 16),
         'abajo_der': (2, 16, 32, 16, 16),
         'arriba': (2, 16, 96, 16, 16),
         'triste': (2, 16, 80, 16, 16)
     }
-
+    #Aquí los sprites de todas las fases de los paquetes
     sprites_paquete = {
         'fase1': (1, 0, 0, 16, 16),
         'fase2': (1, 0, 16, 16, 16),
@@ -30,12 +32,12 @@ class Tablero:
         'fase5': (1, 0, 64, 16, 16),
         'fase6': (1, 0, 80, 16, 16),
     }
-
+    #Aquí los posibles sprites del jefe
     sprites_jefe = {
         'jefe_luigi': (2, 32, 0, 16, 16),
         'jefe_mario': (2, 32, 16, 16, 16),
     }
-
+    #Aquí los posibles sprites del camión
     sprites_camion = {
         'cam0': (1, 16, 0, 32, 24),
         'cam1': (1, 16, 24, 32, 24),
@@ -47,113 +49,92 @@ class Tablero:
         'cam7': (1, 16, 168, 32, 24),
         'cam8': (1, 16, 192, 32, 24),
     }
-
+    #En el init ponemos las propiedades del tablero (lo que mide)
     def __init__(self, ancho: int, alto: int):
         self.ancho = ancho
         self.alto = alto
-        self.game_over = False
+        self.game_over = False #Para cuando se alcancen los 3 fallos
+        self.puntos = 0 #Los puntos que lleve el jugador
+        self.fallos = 0 #Los fallos que lleve el jugador
+        self.max_fallos = 3 #Los fallos máximos que puede tener el jugador
 
-        self.puntos = 0
-        self.fallos = 0
-        self.max_fallos = 3
-
-        # --- NIVELES ---
-        self.num_niveles = 5
+        self.num_niveles = 5 #Los niveles que tiene el juego
+        #Márgenes por arriba y abajo para que los sprites no se salgan de la pantalla
         self.margen_arriba = 45
         self.margen_abajo = 45
         espacio_util = self.alto - self.margen_arriba - self.margen_abajo
+        #La diferencia de altura que hay entre niveles
         self.dif_niveles = espacio_util // (self.num_niveles - 1)
+        #Una lista con la altura de todos los niveles
+        self.niveles_y = []
+        for i in range(self.num_niveles):
+            self.niveles_y.append(self.margen_arriba + i * self.dif_niveles)
 
-        self.niveles_y = [
-            self.margen_arriba + i * self.dif_niveles
-            for i in range(self.num_niveles)
-        ]
-
-        # --- PERSONAJES ---
-        self.x_base_mario = 390
-        self.x_base_luigi = 124
-
-        # CORRECCIÓN: Pasamos el nombre "mario" o "luigi" al constructor
+        self.x_base_mario = 390 #La posición x de mario
+        self.x_base_luigi = 124 #La posición x de luigi
+        #Definimos a mario y a luigi
         self.mario = Personaje("mario", x=self.x_base_mario, y=self.niveles_y[4] + 13, sprites=self.sprites_mario,
-                               nivel=0,
-                               tope_arriba=4, tope_abajo=0, tablero=self)
+                               nivel=0, tope_arriba=4, tope_abajo=0, tablero=self)
         self.luigi = Personaje("luigi", x=self.x_base_luigi, y=self.niveles_y[4] - 28, sprites=self.sprites_luigi,
                                nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
-
+        #Definimos al Jefe
         self.jefe = Jefe(sprites=self.sprites_jefe)
-        self.pausado_por_jefe = False
-
-        # --- CAMIÓN ---
+        self.pausado_por_jefe = False #Para saber si el juego se ha pausado por la aparición del jefe
+        #Definimos al Camión
         self.camion = Camion(x=18, y=40, sprites=self.sprites_camion)
-        self.pausado_por_camion = False
+        self.pausado_por_camion = False #Para saber si el juego se ha pausado porque el camión se está llendo
 
-        # --- CINTAS ---
+        #Aquí definimos las cintas del juego
         self.cintas = [
-            Cinta(self.niveles_y[4] + 17, -1, 512, 425),  # Entrada
-            Cinta(self.niveles_y[4], -1, 380, 148),  # Suelo
-            Cinta(self.niveles_y[3], +1, 148, 380),  # Nivel 1
-            Cinta(self.niveles_y[2], -1, 380, 148),  # Nivel 2
-            Cinta(self.niveles_y[1], +1, 148, 380),  # Nivel 3
-            Cinta(self.niveles_y[0], -1, 380, 155)  # Nivel 4 -> Camión
+            Cinta(self.niveles_y[4] + 17, -1, 512, 425), #Cinta 0
+            Cinta(self.niveles_y[4], -1, 380, 148), #Cinta 1
+            Cinta(self.niveles_y[3], +1, 148, 380), #Cinta 2
+            Cinta(self.niveles_y[2], -1, 380, 148), #Cinta 3
+            Cinta(self.niveles_y[1], +1, 148, 380), #Cinta 4
+            Cinta(self.niveles_y[0], -1, 380, 155)  #Cinta 5
         ]
 
-        self.paquetes = []
-        self.min_paquetes = 1
+        self.paquetes = [] #Lista con los paquetes en pantalla
+        self.min_paquetes = 1 #Los paquetes que tiene que haber mínimo en pantalla
 
-        pyxel.init(self.ancho, self.alto, title="Mario Bros Game & Watch")
+        #Ponemos las funciones necesarias de pyxel para iniciar el juego
+        pyxel.init(self.ancho, self.alto, title="PROYECTO FINAL MARIO BROSS")
         pyxel.load("assets/resources.pyxres")
         pyxel.run(self.update, self.draw)
 
+    #Aquí vamos actualizando el mínimo de paquetes cada vez que el jugador haga puntos múltiplos de 50.
     def actualizar_min_paquetes(self):
-        self.min_paquetes = 1 + (self.puntos // 100)
-
+        self.min_paquetes += self.puntos // 50
+    #Usaremos esta función para generar los paquetes
     def generar_paquete(self):
-        cinta_entrada = self.cintas[0]
         self.paquetes.append(Paquete(
             cinta_id=0,
-            x=cinta_entrada.x_inicio,
-            y=cinta_entrada.y - 4,
+            x=self.cintas[0].x_inicio,
+            y=self.cintas[0].y - 4,
             sprites=self.sprites_paquete,
             nivel=0
         ))
-
+    #Con este método comprobamos si los paquetes están a la misma altura que el personaje
     def verificar_colisiones(self):
         for paquete in self.paquetes:
-            if not paquete.activo or paquete.cayendo or not paquete.en_borde:
-                continue
-
-            if paquete.cinta_id == 0:
-                if self.mario.nivel == 0:
-                    self.subir_paquete(paquete, self.mario)
+            #Solo funciona si el paquete no se está cayendo, si está activo y si está en el borde
+            if paquete.activo and not paquete.cayendo and paquete.en_borde:
+                #En el caso de que ya haya que dejar el paquete en el camión
+                if paquete.cinta_id == 5:
+                    self.entregar_paquete(paquete)
+                #Para el resto de los casos
                 else:
-                    self.iniciar_caida(paquete, "mario")
-
-            elif paquete.cinta_id == 1:
-                if self.luigi.nivel == 1:
-                    self.subir_paquete(paquete, self.luigi)
-                else:
-                    self.iniciar_caida(paquete, "luigi")
-
-            elif paquete.cinta_id == 2:
-                if self.mario.nivel == 2:
-                    self.subir_paquete(paquete, self.mario)
-                else:
-                    self.iniciar_caida(paquete, "mario")
-
-            elif paquete.cinta_id == 3:
-                if self.luigi.nivel == 3:
-                    self.subir_paquete(paquete, self.luigi)
-                else:
-                    self.iniciar_caida(paquete, "luigi")
-
-            elif paquete.cinta_id == 4:
-                if self.mario.nivel == 4:
-                    self.subir_paquete(paquete, self.mario)
-                else:
-                    self.iniciar_caida(paquete, "mario")
-
-            elif paquete.cinta_id == 5:
-                self.entregar_paquete(paquete)
+                    #Si la cinta es par, es de mario
+                    if paquete.cinta_id % 2 == 0:
+                        personaje_encargado = self.mario
+                    #Y si no lo es, es de luigi
+                    else:
+                        personaje_encargado = self.luigi
+                    #Si están en el mismo nivel el paquete sube, y si no, se cae
+                    if personaje_encargado.nivel == paquete.cinta_id:
+                        self.subir_paquete(paquete, personaje_encargado)
+                    else:
+                        self.iniciar_caida(paquete, personaje_encargado.nombre)
 
     def subir_paquete(self, paquete, personaje):
         paquete.cinta_id += 1
