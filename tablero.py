@@ -104,7 +104,7 @@ class Tablero:
 
     #Aquí vamos actualizando el mínimo de paquetes cada vez que el jugador haga puntos múltiplos de 50.
     def actualizar_min_paquetes(self):
-        self.min_paquetes += self.puntos // 50
+        self.min_paquetes += (self.puntos // 50)
     #Usaremos esta función para generar los paquetes
     def generar_paquete(self):
         self.paquetes.append(Paquete(
@@ -138,8 +138,7 @@ class Tablero:
 
     def subir_paquete(self, paquete, personaje):
         paquete.cinta_id += 1
-        idx = paquete.cinta_id if paquete.cinta_id < len(self.cintas) else len(self.cintas) - 1
-        nueva_cinta = self.cintas[idx]
+        nueva_cinta = self.cintas[paquete.cinta_id]
         paquete.x = nueva_cinta.x_inicio
         paquete.y = nueva_cinta.y - 4
         paquete.en_borde = False
