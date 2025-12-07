@@ -3,7 +3,7 @@ class Personaje:
     def __init__(self, nombre: str, x: int, y: int, sprites: dict, nivel: int, tope_arriba: int, tope_abajo: int,
                  tablero):
         self.nombre = nombre
-        #Dónde aparece el personaje
+        #Donde aparece el personaje
         self.x = x
         self.y = y
         self.sprites = sprites #Sus posibles sprites
@@ -74,10 +74,10 @@ class Personaje:
 class Camion:
     def __init__(self, x: int, y: int, sprites: dict):
         self.x_inicial = x #En que x aparece el camion
-        # Dónde aparece el personaje
+        #Donde aparece el camión
         self.x = x
         self.y = y
-        self.sprites = sprites  # Sus posibles sprites
+        self.sprites = sprites  #Sus posibles sprites
         #Cantidad de cajas con las que el camión empieza y la máxima
         self.cajas = 0
         self.max_cajas = 8
@@ -128,50 +128,54 @@ class Cinta:
 class Paquete:
     def __init__(self, cinta_id: int, x: int, y: int, sprites: dict, nivel: int):
         self.cinta_id = cinta_id #En que cinta se encuentra el paquete
+        #Donde aparecen los paquetes
         self.x = x
         self.y = y
-        self.sprites = sprites
-        self.fase = 1
-        self.contador_anim = 0
-        self.nivel = nivel
-        self.activo = True
-        self.en_borde = False
-        self.cayendo = False
-        self.velocidad_caida = 3
-        self.culpable = None
-        self.ha_cruzado = False
+        self.sprites = sprites #Sus posibles sprites
+        self.fase = 1 #La fase en la que empieza el paquete
+        self.nivel = nivel # El nivel en el que se encuentra el paquete
+        self.activo = True #Para saber si los paquetes se tienen que mover o no
+        self.en_borde = False #Para saber si los paquetes están en el borde de la cinta o no
+        self.cayendo = False #Para saber si los paquetes se están cayendo o no
+        self.velocidad_caida = 3 #La velocidad a la que se caen los paquete
+        self.culpable = None #Para saber quien es el culpable de que se haya caido la caja si mario o luigi
+        self.ha_cruzado = False #Para saber si ha pasado por el centro y asi cambiar de fase o no
 
     def actualizar_fase(self, centro):
+    #Para que el paquete cambie de fase
         if not self.ha_cruzado and abs(self.x - centro) <= 2:
+        #Si la distancia entre el centro y el paquete es <2 cambia de fase
             self.fase += 1
             if self.fase > 6:
                 self.fase = 1
             self.ha_cruzado = True
-
+    #Aquí definimos el movimiento de las cajas y los mecanismos de si se cae o si llega al borde, etc.
     def mover(self, cintas, centro, suelo_y):
-        if not self.activo: return
-
+        #Si el paquete no está activo está quieto
+        if not self.activo:
+            return
+        #Si el paquete se está cayendo
         if self.cayendo:
             self.y += self.velocidad_caida
             if self.y > suelo_y + 50:
                 self.activo = False
             return
+        #Por si la cinta_id es mayor que la cantidad de cintas que hay
+        if self.cinta_id < len(cintas):
+            n_cinta = self.cinta_id
+            cinta = cintas[n_cinta]
 
-        idx = self.cinta_id if self.cinta_id < len(cintas) else len(cintas) - 1
-        cinta = cintas[idx]
-
+        #Definimos como se mueve el paquete
         nueva_x = self.x + (1 * cinta.direccion)
-
+        #Hacemos esto para saber si el paquete está en el final de la cinta o no
         llegada_fin = False
-        if cinta.direccion == -1 and nueva_x <= cinta.x_fin:
-            llegada_fin = True
-            self.x = cinta.x_fin
-        elif cinta.direccion == 1 and nueva_x >= cinta.x_fin:
+        if cinta.direccion == -1 and nueva_x <= cinta.x_fin or cinta.direccion == 1 and nueva_x >= cinta.x_fin:
             llegada_fin = True
             self.x = cinta.x_fin
 
         if llegada_fin:
             self.en_borde = True
+        #Si no está en el borde de la cinta se mueve normal y comprobamos si cambia de fase o no
         else:
             self.x = nueva_x
             self.en_borde = False
@@ -180,14 +184,16 @@ class Paquete:
 
 class Jefe:
     def __init__(self, sprites: dict):
+        #Donde aparece el jefe
         self.x = 0
         self.y = 0
-        self.sprites = sprites
-        self.activo = False
-        self.objetivo = None
-        self.temporizador = 0
-        self.duracion_enfado = 3 * 30
+        self.sprites = sprites #Sus posibles sprites
+        self.activo = False #Si el jefe tiene que aparecer o no
+        self.objetivo = None #Saber cual es el objetivo del jefe(luigi o mario).
+        self.temporizador = 0 #Temporizador para hacer desaparecer al jefe
+        self.duracion_enfado = 3 * 30 #Cuánto dura el enfado
 
+    #Hacemos este método para cuando tenga que aparecer el jefe
     def activar(self, objetivo: str, x: int, y: int):
         self.activo = True
         self.objetivo = objetivo
@@ -195,6 +201,7 @@ class Jefe:
         self.y = y
         self.temporizador = self.duracion_enfado
 
+    #Hacemos un update en la clase Jefe para que una vez se acabe el temporizador desaparezca otra vez
     def update(self):
         if self.activo:
             self.temporizador -= 1

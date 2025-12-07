@@ -37,15 +37,15 @@ class Tablero:
     }
 
     sprites_camion = {
-        'cam0': (1, 16, 0, 32, 24, 14),
-        'cam1': (1, 16, 24, 32, 24, 14),
-        'cam2': (1, 16, 48, 32, 24, 14),
-        'cam3': (1, 16, 72, 32, 24, 14),
-        'cam4': (1, 16, 96, 32, 24, 14),
-        'cam5': (1, 16, 120, 32, 24, 14),
-        'cam6': (1, 16, 144, 32, 24, 14),
-        'cam7': (1, 16, 168, 32, 24, 14),
-        'cam8': (1, 16, 192, 32, 24, 14),
+        'cam0': (1, 16, 0, 32, 24),
+        'cam1': (1, 16, 24, 32, 24),
+        'cam2': (1, 16, 48, 32, 24),
+        'cam3': (1, 16, 72, 32, 24),
+        'cam4': (1, 16, 96, 32, 24),
+        'cam5': (1, 16, 120, 32, 24),
+        'cam6': (1, 16, 144, 32, 24),
+        'cam7': (1, 16, 168, 32, 24),
+        'cam8': (1, 16, 192, 32, 24),
     }
 
     def __init__(self, ancho: int, alto: int):
@@ -213,11 +213,6 @@ class Tablero:
             self.pausado_por_camion = True
 
     def update(self):
-        if self.game_over:
-            if pyxel.btnp(pyxel.KEY_R):
-                self.__init__(self.ancho, self.alto)
-            return
-
         # --- ACTUALIZAR SPRITES SIEMPRE (Incluso en pausa) ---
         self.mario.actualizar_sprite()
         self.luigi.actualizar_sprite()
@@ -311,7 +306,7 @@ class Tablero:
         # Camión (Dinámico)
         nombre_sprite = f"cam{self.camion.cajas}"
         if nombre_sprite in self.camion.sprites:
-            pyxel.blt(self.camion.x, self.camion.y, *self.camion.sprites[nombre_sprite], scale=2)
+            pyxel.blt(self.camion.x, self.camion.y, *self.camion.sprites[nombre_sprite],colkey=14, scale=2)
 
         if self.jefe.activo:
             sprite = self.jefe.sprites[self.jefe.objetivo]
