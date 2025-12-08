@@ -73,10 +73,10 @@ class Tablero:
         self.x_base_mario = 390 #La posición x de mario
         self.x_base_luigi = 124 #La posición x de luigi
         #Definimos a mario y a luigi
-        self.mario = Personaje("mario", x=self.x_base_mario, y=self.niveles_y[4] + 13, sprites=self.sprites_mario,
-                               nivel=0, tope_arriba=4, tope_abajo=0, tablero=self)
-        self.luigi = Personaje("luigi", x=self.x_base_luigi, y=self.niveles_y[4] - 28, sprites=self.sprites_luigi,
-                               nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
+        self.mario = Personaje("mario", x=self.x_base_mario, y=self.niveles_y[4] + 13,
+                               sprites=self.sprites_mario, nivel=0, tope_arriba=4, tope_abajo=0, tablero=self)
+        self.luigi = Personaje("luigi", x=self.x_base_luigi, y=self.niveles_y[4] - 28,
+                               sprites=self.sprites_luigi, nivel=1, tope_arriba=5, tope_abajo=1, tablero=self)
         #Definimos al Jefe
         self.jefe = Jefe(sprites=self.sprites_jefe)
         self.pausado_por_jefe = False #Para saber si el juego se ha pausado por la aparición del jefe
@@ -104,7 +104,7 @@ class Tablero:
 
     #Aquí vamos actualizando el mínimo de paquetes cada vez que el jugador haga puntos múltiplos de 50.
     def actualizar_min_paquetes(self):
-        self.min_paquetes += (self.puntos // 50)
+        self.min_paquetes = 1 + (self.puntos // 50)
     #Usaremos esta función para generar los paquetes
     def generar_paquete(self):
         self.paquetes.append(Paquete(
@@ -135,7 +135,7 @@ class Tablero:
                         self.subir_paquete(paquete, personaje_encargado)
                     else:
                         self.iniciar_caida(paquete, personaje_encargado.nombre)
-
+    #Usará este método cada vez que se tenga que subir un paquete
     def subir_paquete(self, paquete, personaje):
         paquete.cinta_id += 1
         nueva_cinta = self.cintas[paquete.cinta_id]
@@ -144,26 +144,26 @@ class Tablero:
         paquete.en_borde = False
         paquete.ha_cruzado = False
 
-        # ANIMACIÓN: Activar sprite "arriba"
+        #Para que el personaje haga la animación de subir
         personaje.animar("subir")
-
+        #Los puntos suben cada vez que el personaje sube una caja a otra cinta
         self.puntos += 10
-        pyxel.play(0, 0)
-
+    #Usamos este método para activar que la caja se ha caido
     def iniciar_caida(self, paquete, culpable):
         paquete.cayendo = True
         paquete.en_borde = False
         paquete.culpable = culpable
-
+    #Aquí sumaremos los fallos que haga el jugador, el jefe regañará a los personajes y si acumulan 3 fallos el juego
+    #terminará
     def registrar_fallo(self, paquete):
         self.fallos += 1
-        pyxel.play(0, 1)
-
+        #Si los fallos llegan al máximo el juego se acaba
         if self.fallos >= self.max_fallos:
             self.game_over = True
+        #Si no entonces el jefe para el juego para regañar
         else:
             self.pausado_por_jefe = True
-
+            #En el caso de que al que se le haya caído la caja a luigi
             if paquete.culpable == "luigi":
                 x_jefe = 50
                 y_jefe = self.niveles_y[4] - 20
@@ -171,39 +171,39 @@ class Tablero:
                 self.luigi.x = x_jefe + 30
                 self.luigi.y = self.niveles_y[4] - 28
                 self.luigi.nivel = 1
-
-            else:  # mario
+            #En el caso de que al que se le haya caído la caja a mario
+            else:
                 x_jefe = 450
                 y_jefe = self.niveles_y[3] - 20
                 self.jefe.activar("jefe_mario", x_jefe, y_jefe)
                 self.mario.x = x_jefe - 30
                 self.mario.y = self.niveles_y[3] - 28
                 self.mario.nivel = 2
-
+    #Usamos este método en el caso de que luigi ya tenga que dejar la caja en el camión
     def entregar_paquete(self, paquete):
         paquete.activo = False
         self.puntos += 10
-        pyxel.play(0, 2)
-
+        #Así luigi usa el sprite adecuado para entregar el paquete
         self.luigi.animar("entregar")
 
-        # Lógica del camión
+        #Así el camión hace su función de llenarse y si está lleno el juego se para al estar el camión en reparto
         self.camion.llenar()
         if self.camion.animacion_salida:
             self.pausado_por_camion = True
 
     def update(self):
-        # --- ACTUALIZAR SPRITES SIEMPRE (Incluso en pausa) ---
+        #Para que se vayan cambiando los sprites cuando sea necesario
         self.mario.actualizar_sprite()
         self.luigi.actualizar_sprite()
 
-        # --- PRIORIDAD DE PAUSAS ---
+        #APARTADO DE PAUSAS
+        #Para cuando el juego se pause por el camión
         if self.pausado_por_camion:
             self.camion.update()
             if not self.camion.animacion_salida:
                 self.pausado_por_camion = False
             return
-
+        #Para cuando el juego se pause por el jefe
         if self.pausado_por_jefe:
             self.jefe.update()
             if not self.jefe.activo:
@@ -212,54 +212,66 @@ class Tablero:
                 self.luigi.x = self.x_base_luigi
             return
 
-            # --- JUEGO NORMAL ---
-        if pyxel.btnp(pyxel.KEY_UP): self.mario.mover("arriba")
-        if pyxel.btnp(pyxel.KEY_DOWN): self.mario.mover("abajo")
-        if pyxel.btnp(pyxel.KEY_W): self.luigi.mover("arriba")
-        if pyxel.btnp(pyxel.KEY_S): self.luigi.mover("abajo")
+        #El movimiento de mario y luigi
+        if pyxel.btnp(pyxel.KEY_UP):
+            self.mario.mover("arriba")
+        if pyxel.btnp(pyxel.KEY_DOWN):
+            self.mario.mover("abajo")
+        if pyxel.btnp(pyxel.KEY_W):
+            self.luigi.mover("arriba")
+        if pyxel.btnp(pyxel.KEY_S):
+            self.luigi.mover("abajo")
 
+        #Actualizamos el mínimo de paquetes
         self.actualizar_min_paquetes()
-
-        if len(self.paquetes) < self.min_paquetes and pyxel.frame_count % 80 == 0:
+        #Si la cantidad de paquetes de pantalla es menor que el minimo de paquetes, generamos otro paquete
+        if len(self.paquetes) < self.min_paquetes:
             self.generar_paquete()
 
+        #Hacemos que se mueva cada paquete y comprobamos si alguno de los paquetes se han caido para registrar el fallo
         for paquete in self.paquetes:
             estaba_activo = paquete.activo
             suelo_y = self.niveles_y[4]
             paquete.mover(self.cintas, self.ancho // 2, suelo_y)
-
+            #Si el paquetes estaba activo, ahora no lo está y se está cayendo es porque el jugador ha fallado
             if estaba_activo and not paquete.activo and paquete.cayendo:
                 self.registrar_fallo(paquete)
-
-        self.paquetes = [p for p in self.paquetes if p.activo]
+        #Aquí registramos los paquetes que están activos
+        paquetes_activos = []
+        for p in self.paquetes:
+            if p.activo:
+                paquetes_activos.append(p)
+        self.paquetes = paquetes_activos
+        #Aquí comprobamos si los paquetes están a la misma altura que el personaje, etc.
         self.verificar_colisiones()
 
     def draw(self):
         pyxel.cls(13)
 
-        # Escaleras
+        #Dibujos de las escaleras
         pyxel.blt(self.x_base_mario, self.niveles_y[4] - 25, 0, 0, 56, 16, 16, 0, scale=2)
         pyxel.blt(self.x_base_mario, self.niveles_y[2] - 25, 0, 0, 56, 16, 16, 0, scale=2)
         pyxel.blt(self.x_base_luigi, self.niveles_y[3] - 25, 0, 0, 56, 16, 16, 0, scale=2)
         pyxel.blt(self.x_base_luigi, self.niveles_y[1] - 25, 0, 0, 56, 16, 16, 0, scale=2)
 
-        # Personajes
-        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites[self.mario.sprite_actual], 0, scale=3)
-        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites[self.luigi.sprite_actual], 0, scale=3)
+        #Dibujos de los personajes
+        pyxel.blt(self.mario.x, self.mario.y, *self.mario.sprites[self.mario.sprite_actual], colkey=0, scale=3)
+        pyxel.blt(self.luigi.x, self.luigi.y, *self.luigi.sprites[self.luigi.sprite_actual], colkey=0, scale=3)
 
-        # Paquetes
+        #Dibujos de los paquetes
         for paquete in self.paquetes:
             sprite = paquete.sprites[f"fase{paquete.fase}"]
             pyxel.blt(paquete.x, paquete.y, *sprite, scale=3, colkey=0)
 
-        # Pilar
+        #Dibujo de la columna de enmedio
         for i in range(16):
             pyxel.blt(self.ancho // 2, 0 + i * 16, 0, 0, 80, 16, 16)
             pyxel.blt(self.ancho // 2 + 16, 0 + i * 16, 0, 0, 80, 16, 16)
             pyxel.blt(self.ancho // 2 - 16, 0 + i * 16, 0, 0, 80, 16, 16)
 
-        # Cintas
-        for i, y in enumerate(self.niveles_y):
+        #Dibujos de las cintas
+        for i in range(len(self.niveles_y)):
+            y = self.niveles_y[i]
             if i % 2 == 0:
                 pyxel.blt(160, y, 0, 8, 16, 80, 16, 11)
             else:
@@ -268,42 +280,40 @@ class Tablero:
                 pyxel.blt(280, y, 0, 0, 0, -96, 16, 11)
             else:
                 pyxel.blt(288, y, 0, 8, 16, -80, 16, 11)
-
+        #Cinta de abajo a la derecha
         pyxel.blt(424, self.niveles_y[4] + 17, 0, 0, 0, 96, 16, 11)
 
-        # Plataformas
+        #Plataformas de luigi
         pyxel.blt(self.x_base_luigi - 90, self.niveles_y[4] + 9, 0, 0, 104, 90, 9, 0, scale=2)
         pyxel.blt(self.x_base_luigi - 30, self.niveles_y[2] + 9, 0, 0, 104, 35, 9, 0, scale=2)
         pyxel.blt(self.x_base_luigi - 30, self.niveles_y[0] + 9, 0, 0, 104, 35, 9, 0, scale=2)
+        #Plataformas de mario
         pyxel.blt(self.x_base_mario + 5, self.niveles_y[4] + 49, 0, 0, 104, 35, 9, 0, scale=2)
         pyxel.blt(self.x_base_mario + 23, self.niveles_y[3] + 9, 0, 0, 104, 72, 9, 0, scale=2)
         pyxel.blt(self.x_base_mario + 5, self.niveles_y[1] + 9, 0, 0, 104, 35, 9, 0, scale=2)
 
-        # Plataforma Camión (Estática)
+        #Plataformas del camión
         pyxel.blt(71, 57, 0, 112, 0, 4, 17, 0, scale=2)
         pyxel.blt(0, 79, 0, 0, 104, 50, 9, 0, scale=2)
 
-        # Camión (Dinámico)
+        #Sprite del camión
         nombre_sprite = f"cam{self.camion.cajas}"
         if nombre_sprite in self.camion.sprites:
             pyxel.blt(self.camion.x, self.camion.y, *self.camion.sprites[nombre_sprite],colkey=14, scale=2)
 
+        #Sprite del jefe
         if self.jefe.activo:
             sprite = self.jefe.sprites[self.jefe.objetivo]
             pyxel.blt(self.jefe.x, self.jefe.y, *sprite, scale=2, colkey=0)
 
-        # UI
+        #Texto de puntos y fallos
         pyxel.text(10, 10, f"PUNTOS: {self.puntos}", 7)
         texto_fallos = "FALLOS: " + "X " * self.fallos
         pyxel.text(300, 10, texto_fallos, 8 if self.fallos > 0 else 7)
-
-
+        #Texto de en que piso de encuentran mario y luigi
         pyxel.text(10, 246, f"PISO LUIGI: {self.luigi.nivel}", 7)
         pyxel.text(450, 10, f"PISO MARIO: {self.mario.nivel}", 7)
-
+        #Texto que sale en pantalla cuando el jugador alcanza los 3 fallos
         if self.game_over:
             pyxel.cls(13)
             pyxel.text(self.ancho // 2 - 30, self.alto // 2, "GAME OVER", 8)
-
-
-prueba = Tablero(512, 256)

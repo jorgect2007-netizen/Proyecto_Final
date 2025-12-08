@@ -101,6 +101,12 @@ class Camion:
         self.animacion_salida = True
         self.temporizador = self.tiempo_espera
 
+    #Este método hace que cuando el camión termine de repartir vuelva a su posición inicial
+    def reset(self):
+        self.cajas = 0
+        self.x = self.x_inicial
+        self.animacion_salida = False
+
     #Aquí definimos el movimiento del camión cuando esté en reparto
     def update(self):
         if self.animacion_salida:
@@ -109,11 +115,7 @@ class Camion:
             if self.temporizador <= 0:
                 self.reset()
 
-    #Este método hace que cuando el camión termine de repartir vuelva a su posición inicial
-    def reset(self):
-        self.cajas = 0
-        self.x = self.x_inicial
-        self.animacion_salida = False
+
 
 #Aquí definiremos las cintas del juego
 class Cinta:
